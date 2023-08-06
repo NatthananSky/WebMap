@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project WebMap</title>
+    <!--Jquery-->
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+        integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+        crossorigin="anonymous"></script>
+    <!--Leaflet-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <!-- AJAX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+
+    <!-- icon -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!--///////Load Plugin///////-->
+
+    <!--Pan Control-->
+    <link rel="stylesheet" href="src/Leaflet.Pancontrol-master/src/L.Control.Pan.css" />
+    <script src="src/Leaflet.Pancontrol-master/src/L.Control.Pan.js"></script>
+
+    <!--Better Scale-->
+    <link rel="stylesheet" href="src/leaflet-betterscale-master/L.Control.BetterScale.css" />
+    <script src="src/leaflet-betterscale-master/L.Control.BetterScale.js"></script>
+
+    <!--GlobeminiMap-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    <script src="src/leaflet-globeminimap-master/src/Control.GlobeMiniMap.js"></script>
+
+    <style>
+        /* Font */
+        @import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        header {
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+            height: 6vh;
+            font-size: 24px;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-container u {
+            font-family: 'Bai Jamjuree', sans-serif;
+            text-decoration-color: greenyellow;
+        }
+
+        .header-container nav {
+            display: flex;
+            margin-left: auto;
+        }
+
+        .header-container nav a {
+            font-family: 'Bai Jamjuree', sans-serif;
+            font-size: 24px;
+            padding: 3px;
+            color: white;
+            text-decoration: none;
+            background-color: #28a745;
+        }
+
+        nav a:hover {
+            background-color: #005915 !important;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 48;
+        }
+
+        .logo {
+            display: flex;
+            margin-right: 5px;
+            margin-left: 5px;
+            width: 5vh;
+        }
+
+        .logo img {
+            width: 100%;
+            border-radius: 50%;
+        }
+
+        #mymap {
+            height: 94vh;
+            width: 100%;
+        }
+
+        #sidebar-left {
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 0%;
+            display: none;
+            float: left;
+            padding: 10px;
+            background-color: white;
+            z-index: 1000;
+        }
+
+        #imgF img {
+            width: 100%;
+            height: 20vh;
+        }
+
+        .div #sidebar-left,
+        #mymap {
+            float: left;
+        }
+
+        p {
+            margin: 0px;
+            padding: 3px;
+            float: left;
+            font-size: 12px;
+        }
+
+        #close-sbr {
+            cursor: pointer;
+            font-size: 25px;
+            font-weight: 100;
+        }
+
+        .sidebar-left h5 {
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- header -->
+    <header>
+        <div class="header-container">
+            <!-- logo -->
+            <div class="logo">
+                <img src="img/logoupdate.png" alt="Logo">
+            </div>
+            <!-- name -->
+            <u>แผนที่ป่าสงวนในจังหวัดขอนแก่น</u>
+            <!-- navbar -->
+            <nav>
+                <!-- button About Us -->
+                <a href="#" id="aboutus">
+                    About Us
+                    <span class="material-symbols-outlined">
+                        touch_app
+                    </span>
+                </a>
+                <!-- button Contact Us -->
+                <a href="#" id="contactus">
+                    Contact Us
+                    <span class="material-symbols-outlined">
+                        touch_app
+                    </span></a>
+            </nav>
+        </div>
+    </header>
+    <!--sidebar-->
+    <div id="sidebar-left">
+        <span id="close-sbr">&times;</span><br><!-- Close btn -->
+        <hr>
+        <h5><b>ชื่อป่าสงวน : </b><span id="nameF"></span></h5>
+        <h5><b>จังหวัด : </b><span id="provF"></span></h5>
+        <h5><b>อำภอ : </b><span id="ampF"></span></h5>
+        <h5><b>ตำบล : </b><span id="tamF"></span></h5>
+        <h5><b>พื้นที่ : </b><span id="areaF"></span></h5>
+        <h5><b>ระวาง : </b><span id="positionF"></span></h5>
+        <h5><b>รูป : </b><br><br>
+            <div id="imgF"></div>
+        </h5>
+    </div>
+    <div>
+
+    </div>
+    <!--Map-->
+    <div id="mymap" style="float : left"></div>
+
+    <script>
+        //create Map
+        var map = L.map('mymap').setView([16.47, 102.82], 9);
+
+        //Basemap
+        var openStreedMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution:
+                // Add lat lon zoom in attribution
+                '<p><b>Lat : </b><span id="mylat">16.47</span></p>' + ' ' +
+                '<p><b>Lon : </b><span id="mylon">102.82</span> </p>' + ' ' +
+                '<p><b>Zoom Level : </b><span id="myZoom">9</span></p>' + ' ' +
+                '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>; '
+        }).addTo(map);//Add Basemap to map
+        var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: 
+                // Add lat lon zoom in attribution
+                '<p><b>Lat : </b><span id="mylat">16.47</span></p>' + ' ' +
+                '<p><b>Lon : </b><span id="mylon">102.82</span> </p>' + ' ' +
+                '<p><b>Zoom Level : </b><span id="myZoom">9</span></p>' + ' ' +
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+        //Load Overlay Map
+        var prov = new L.GeoJSON.AJAX("data/KK_Province.geojson", {
+            onEachFeature: function (feature, layer) {
+                layer.bindTooltip("<b>อ." + (feature.properties.AMP_NAMT) + "</b>")//Show if click
+                layer.bindPopup("<b>อ." + (feature.properties.AMP_NAMT) +//Show if hover
+                    "</b><br>พื้นที่ = " + ((feature.properties.AREA) / (10 ** 6)).toFixed(2) + " ตร.กม.")
+                layer.setStyle({//Set Style feature
+                    color: 'blue',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 1,
+                    fillColor: 'red'
+                })
+            }
+        }).addTo(map);//Add layer to map
+
+        var frkk = new L.GeoJSON.AJAX("data/Forest_name.geojson", {
+            onEachFeature: function (feature, layer) {
+                layer.on({
+                    click: function () {
+                        //Open sidebar
+                        $("#sidebar-left").css("display", "block");
+                        $("#sidebar-left").css("width", "20%");
+                        $("#mymap").css("width", "80%");
+                        //Edit/Update sidebar
+                        $("#nameF").html(feature.properties.NAME_TH)
+                        $("#provF").html(feature.properties.จังหวัด)
+                        $("#ampF").html(feature.properties.อำเภอ)
+                        $("#tamF").html(feature.properties.ตำบล)
+                        $("#areaF").html(feature.properties.RAI+' '+'ไร่')
+                        $("#positionF").html(feature.properties.ระวาง)
+                        $("#imgF").html("<img src='img/" + feature.properties.รูป + "'>")
+                    }
+                });
+                layer.setStyle({//Set Style feature
+                    color: 'yellow',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 1,
+                    fillColor: 'green'
+                })
+            }
+        });
+
+        // Create Control Layers
+        var baseLayers = {
+            "OpenStreedMap": openStreedMap,
+            "OpenStreetMap_DE": OpenStreetMap_DE
+        };
+
+        var overlays = {
+            "Forest": frkk,
+            "Province": prov
+        };
+
+        // Add Control Layers to Map
+        L.control.layers(baseLayers, overlays).addTo(map);
+
+        //////Add Plugin//////
+        //Pan Control
+        L.control.pan().addTo(map);
+
+        //BetterScale
+        L.control.betterscale({ metric: true, imperial: false }).addTo(map);
+
+        //GlobeminiMap
+        var miniMap = new L.Control.GlobeMiniMap({
+            land: '#FFFF00',
+            water: '#3333FF',
+            marker: '#000000',
+            topojsonSrc: 'src/leaflet-globeminimap-master/src/world.json'
+        }).addTo(map);
+
+        //////////EVENT//////////
+        //Event Listener
+        map.on("mousemove", onMouseMove);
+        map.on("zoom", onZoom);
+
+        //About Us
+        $("#aboutus").on({
+            click: function () {
+                alert("จัดทำโดย\nกลุ่ม ศรัณย์ซอนเซงนิม\n1.นายอัครินทร์ มีชาลือ\n2.นางสาวสุกัญญา ทรัพย์พงษ์\n3.นายณัฐนันท์ แสนกันยา\n4.นางสาวกวินนา ภูพบบุญ");
+            }
+        })
+        
+        //Contact Us
+        $("#contactus").on({
+            click: function () {
+                alert("ติดต่อได้ที่\nakarin_me@kkumail.com(คนคิดชื่อกลุ่ม)\nkavinna.p@kkumail.com");
+            }
+        })
+
+        //Event Handlers
+        function onMouseMove(e) {
+            $("#mylat").html(parseFloat(e.latlng.lat).toFixed(5));
+            $("#mylon").html(parseFloat(e.latlng.lng).toFixed(5));
+        };
+
+        //Map On Zoom Event
+        function onZoom(e) {
+            $("#myZoom").html(map.getZoom());
+        };
+
+        //close sidebar
+        $("#close-sbr").on({
+            click: function () {
+                $("#sidebar-left").css("display", "none");
+                $("#sidebar-left").css("width", "0%");
+                $("#mymap").css("width", "100%");
+            }
+        });
+
+    </script>
+</body>
+
+</html>
